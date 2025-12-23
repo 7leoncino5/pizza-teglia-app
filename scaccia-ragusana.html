@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Scaccia Ragusana – Calcolatore</title>
+
+<style>
+  body {
+    font-family: system-ui, sans-serif;
+    max-width: 720px;
+    margin: 40px auto;
+    padding: 16px;
+  }
+
+  h1 { margin-bottom: 0.4rem; }
+  h2 { margin-top: 2rem; }
+
+  label {
+    font-weight: 600;
+    display: block;
+    margin-top: 1.2rem;
+  }
+
+  input, select {
+    width: 100%;
+    padding: 8px;
+    font-size: 1rem;
+    box-sizing: border-box;
+  }
+
+  button {
+    margin-top: 1.4rem;
+    padding: 10px 16px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background: #222;
+    color: #fff;
+  }
+
+  .results {
+    background: #f5f5f5;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 28px;
+  }
+
+  hr {
+    margin: 32px 0;
+  }
+
+  /* --- FASI RICETTA --- */
+
+  .step {
+    margin-bottom: 1.4rem;
+    padding-left: 4px;
+  }
+
+  .step-title {
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+  }
+
+  .step-body {
+    line-height: 1.45;
+  }
+
+  strong {
+    font-weight: 600;
+  }
+</style>
+</head>
+
+<body>
+
+<h1>Scaccia Ragusana</h1>
+<p>
+Calcolatore ingredienti, fasi di lavorazione e porzionatura.<br>
+Semola rimacinata, idratazione contenuta, impasto lento.
+</p>
+
+<label>Farina (semola rimacinata, g)</label>
+<input type="number" id="flour" placeholder="Es. 500" min="1">
+
+<label>Tipo di lievito</label>
+<select id="yeastType">
+  <option value="dry">Lievito secco</option>
+  <option value="fresh">Lievito fresco</option>
+</select>
+
+<button onclick="calc()">Calcola</button>
+
+<div id="results" class="results" style="display:none;">
+
+  <h2>Ingredienti</h2>
+  <p><strong>Farina:</strong> <span id="outFlour"></span> g</p>
+  <p><strong>Acqua (44%):</strong> <span id="outWater"></span> g</p>
+  <p><strong>Olio EVO (10%):</strong> <span id="outOil"></span> g</p>
+  <p><strong>Sale (2%):</strong> <span id="outSalt"></span> g</p>
+  <p><strong>Lievito:</strong> <span id="outYeast"></span> g</p>
+
+  <p><strong>Peso totale impasto (stimato):</strong> <span id="outDough"></span> g</p>
+
+  <hr>
+
+  <h2>Porzionatura</h2>
+  <p>
+    L’impasto può essere utilizzato in <strong>un’unica scaccia</strong><br>
+    oppure diviso in panetti.
+  </p>
+  <p>
+    <strong>Panetti da 300 g:</strong>
+    <span id="outBalls"></span>
+  </p>
+  <p>
+    <strong>Peso reale per panetto:</strong>
+    <span id="outBallWeight"></span> g
+  </p>
+
+  <hr>
+
+  <h2>Gestione dell’acqua</h2>
+  <ul>
+    <li>Autolisi (75%): <strong><span id="outWaterAuto"></span> g</strong></li>
+    <li>Durante l’impasto: <strong><span id="outWaterRest"></span> g</strong></li>
+  </ul>
+
+  <hr>
+
+  <h2>Fasi della ricetta</h2>
+
+  <div class="step">
+    <div class="step-title">1️⃣ Autolisi</div>
+    <div class="step-body">
+      Unire la semola con <strong><span id="outWaterAuto2"></span> g</strong> di acqua.<br>
+      Riposo: <strong>20 minuti</strong>.
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-title">2️⃣ Inserimento del lievito</div>
+    <div class="step-body">
+      Avviare un <strong>impasto lento</strong>.
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-title">3️⃣ Aggiunta graduale dell’acqua</div>
+    <div class="step-body">
+      Inserire quasi tutta l’acqua restante
+      (<strong><span id="outWaterRest2"></span> g</strong>),<br>
+      tenendone una piccola parte per il sale.
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-title">4️⃣ Inserimento del sale</div>
+    <div class="step-body">
+      Aggiungere il sale con la poca acqua rimasta.
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-title">5️⃣ Inserimento dell’olio</div>
+    <div class="step-body">
+      Impastare fino a <strong>incordatura completa</strong>.
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-title">6️⃣ Maturazione</div>
+    <div class="step-body">
+      Frigorifero per <strong>12 ore</strong>.
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-title">7️⃣ Riposo</div>
+    <div class="step-body">
+      Fuori frigo per <strong>30 minuti</strong>.
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-title">8️⃣ Stesura</div>
+    <div class="step-body">
+      Stendere finemente con il matterello.
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-title">9️⃣ Farcitura e piegatura</div>
+    <div class="step-body">
+      Condire a piacere e ripiegare.
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-title">🔟 Riposo finale</div>
+    <div class="step-body">
+      Olio in superficie, riposo <strong>1 ora</strong>.
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-title">1️⃣1️⃣ Cottura</div>
+    <div class="step-body">
+      Forno statico <strong>220 °C</strong><br>
+      per <strong>25 minuti</strong>.
+    </div>
+  </div>
+
+</div>
+
+<script>
+function round(v) {
+  return Math.round(v);
+}
+
+function calc() {
+  const F = parseFloat(document.getElementById("flour").value);
+  const yeastType = document.getElementById("yeastType").value;
+
+  if (!F || F <= 0) {
+    alert("Inserisci una quantità valida di farina.");
+    return;
+  }
+
+  const water = F * 0.44;
+  const oil   = F * 0.10;
+  const salt  = F * 0.02;
+  const yeast = yeastType === "dry" ? F * 0.006 : F * 0.014;
+
+  const dough = F + water + oil + salt + yeast;
+
+  const balls = Math.floor(dough / 300);
+  const ballWeight = balls > 0 ? dough / balls : dough;
+
+  const waterAuto = water * 0.75;
+  const waterRest = water * 0.25;
+
+  document.getElementById("outFlour").textContent = round(F);
+  document.getElementById("outWater").textContent = round(water);
+  document.getElementById("outOil").textContent   = round(oil);
+  document.getElementById("outSalt").textContent  = round(salt);
+  document.getElementById("outYeast").textContent = round(yeast);
+  document.getElementById("outDough").textContent = round(dough);
+
+  document.getElementById("outBalls").textContent = balls;
+  document.getElementById("outBallWeight").textContent = round(ballWeight);
+
+  document.getElementById("outWaterAuto").textContent = round(waterAuto);
+  document.getElementById("outWaterRest").textContent = round(waterRest);
+  document.getElementById("outWaterAuto2").textContent = round(waterAuto);
+  document.getElementById("outWaterRest2").textContent = round(waterRest);
+
+  document.getElementById("results").style.display = "block";
+}
+</script>
+
+</body>
+</html>
