@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Impasti Semola – Calcolo Resa</title>
+
+<style>
+body{
+  font-family:system-ui,sans-serif;
+  max-width:720px;
+  margin:40px auto;
+  padding:16px;
+}
+h1{margin-bottom:.4rem;}
+label{
+  font-weight:600;
+  display:block;
+  margin-top:1.2rem;
+}
+input,select{
+  width:100%;
+  padding:8px;
+  font-size:1rem;
+  box-sizing:border-box;
+}
+button{
+  margin-top:1.4rem;
+  padding:10px 16px;
+  font-size:1rem;
+  border:none;
+  border-radius:6px;
+  background:#222;
+  color:#fff;
+  cursor:pointer;
+}
+.results{
+  background:#f5f5f5;
+  padding:20px;
+  border-radius:8px;
+  margin-top:28px;
+}
+.back{
+  display:inline-block;
+  margin-bottom:16px;
+  text-decoration:none;
+  font-weight:600;
+}
+hr{margin:28px 0;}
+.note{
+  font-size:.95rem;
+  line-height:1.4;
+  margin-top:10px;
+}
+</style>
+
+<link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
+<meta name="apple-mobile-web-app-title" content="Ricette">
+<meta name="apple-mobile-web-app-capable" content="yes">
+</head>
+
+<body>
+
+<a class="back" href="index.html">← Torna al menu</a>
+
+<h1>Impasti Semola – Calcolo Resa</h1>
+
+<label>Tipo preparazione</label>
+<select id="tipo">
+  <option value="scacciata">Scacciata</option>
+  <option value="scacciata-alta">Scacciata (impasto più alto)</option>
+  <option value="pizza">Pizza in teglia</option>
+</select>
+
+<label>Numero teglie / pezzi</label>
+<input type="number" id="numero" placeholder="Es. 2" min="1" step="1">
+
+<button onclick="calc()">Calcola</button>
+
+<div id="results" class="results" style="display:none;">
+
+<h2>Resa impasto</h2>
+<p><strong>Peso impasto target:</strong> <span id="outDoughTarget"></span> g</p>
+<p><strong>Peso impasto stimato (calcolato):</strong> <span id="outDoughCalc"></span> g</p>
+<p><strong>Numero panetti:</strong> <span id="outBalls"></span></p>
+<p><strong>Peso panetto (stimato):</strong> <span id="outBallWeight"></span> g</p>
+
+<p class="note">
+Il lievito è <strong>fisso a 7 g</strong> (non in proporzione). Se vuoi aumentarlo/diminuirlo lo fai a mano.
+</p>
+
+<hr>
+
+<h2>Ingredienti</h2>
+<p><strong>Semola rimacinata:</strong> <span id="outFlour"></span> g</p>
+<p><strong>Acqua totale (65%):</strong> <span id="outWater"></span> g</p>
+
+<ul>
+<li>Acqua impasto: <span id="outWaterMain"></span> g</li>
+<li>Acqua scioglimento lievito: <span id="outWaterYeast"></span> g</li>
+</ul>
+
+<p><strong>Sale (2%):</strong> <span id="outSalt"></span> g</p>
+<p><strong>Malto (0,5%):</strong> <span id="outMalt"></span> g</p>
+<p><strong>Lievito fresco (fisso):</strong> <span id="outYeast"></span> g</p>
+
+</div>
+
+<script>
+function r(v){return Math.round(v);}
+
+function calc(){
+  const tipo = document.getElementById("tipo").value;
+  const n = parseInt(document.getElementById("numero").value,10);
+
+  if(!n || n<=0){
+    alert("Inserisci un numero valido.");
+    return;
+  }
+
+  // Target per pezzo
+  let doughPerPiece = 0;
+  let balls = 0;
+
+  if(tipo==="scacciata"){
+    doughPerPiece = 1000;   // 2×500
+    balls = n * 2;
+  }
+  if(tipo==="scacciata-alta"){
+    doughPerPiece = 1100;   // 2×550
+    balls = n * 2;
+  }
+  if(tipo==="pizza"){
+    doughPerPiece = 500;    // 1×500
+    balls = n;
+  }
+
+  const doughTarget = doughPerPiece * n;
+
+  // Percentuali (escludiamo il lievito: fisso)
+  const pctWater = 0.65;
+  const pctSalt  = 0.02;
+  const pctMalt  = 0.005;
+
+  const yeastFixed = 7; // g, NON proporzionale
+
+  // Peso impasto = farina*(1+%water+%salt+%malt) + lievito
+  const factor = 1 + pctWater + pctSalt + pctMalt;
+
+  // Calcolo farina necessaria per raggiungere il target (compensando il lievito fisso)
+  let flour = (doughTarget - yeastFixed) / factor;
+
+  // Arrotondamento pulito (10g in eccesso)
+  flour = Math.ceil(flour / 10) * 10;
+
+  // Ingredienti
+  const water = flour * pctWater;
+  const salt  = flour * pctSalt;
+  const malt  = flour * pctMalt;
+
+  // Ripartizione acqua (come tua prassi: 50g per lievito se possibile)
+  // Qui la rendiamo "intelligente": max 50g, ma non più del 10% dell'acqua totale.
+  const waterYeast = Math.min(50, water * 0.10);
+  const waterMain  = water - waterYeast;
+
+  const doughCalc = flour + water + salt + malt + yeastFixed;
+  const ballWeight = doughCalc / balls;
+
+  // Output
+  document.getElementById("outDoughTarget").textContent = r(doughTarget);
+  document.getElementById("outDoughCalc").textContent = r(doughCalc);
+
+  document.getElementById("outBalls").textContent = balls;
+  document.getElementById("outBallWeight").textContent = r(ballWeight);
+
+  document.getElementById("outFlour").textContent = r(flour);
+  document.getElementById("outWater").textContent = r(water);
+  document.getElementById("outWaterMain").textContent = r(waterMain);
+  document.getElementById("outWaterYeast").textContent = r(waterYeast);
+
+  document.getElementById("outSalt").textContent = r(salt);
+  document.getElementById("outMalt").textContent = r(malt);
+  document.getElementById("outYeast").textContent = yeastFixed;
+
+  document.getElementById("results").style.display="block";
+}
+</script>
+
+</body>
+</html>
